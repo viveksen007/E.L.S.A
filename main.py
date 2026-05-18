@@ -170,6 +170,93 @@ async def remove(ctx):
             discord.Color.red()
         )
 
+# @bot.command()
+# async def dm(ctx, *, msg):
+#     try:
+#         await ctx.author.send(f"{msg}")
+        
+#         await send_log(
+#             "⚡ Command Used",
+#             f"{ctx.author.mention} successfully received a DM.",
+#             discord.Color.dark_blue()
+#         )
+#     except discord.Forbidden:
+#         await ctx.send(f"❌ {ctx.author.mention}, I couldn't send you a DM. Please check your privacy settings!")
+
+@bot.command()
+async def dm(ctx, user_id: int, *, msg):
+    try:
+        # Fetch the user object from Discord using their unique ID
+        user = await bot.fetch_user(user_id)
+        
+        # Send the DM
+        await user.send(f"Message from {ctx.author.mention}: {msg}")
+        await ctx.send(f"✅ Message successfully sent to {user.name} (ID: {user_id})!")
+
+        # Log the event
+        await send_log(
+            "✉️ DM Sent via ID",
+            f"{ctx.author.mention} sent a DM to user ID: {user_id}.",
+            discord.Color.green()
+        )
+        
+    except discord.NotFound:
+        # Handles the error if the ID doesn't exist on Discord
+        await ctx.send("❌ Invalid User ID. I couldn't find anyone with that ID.")
+        
+    except discord.Forbidden:
+        # Handles the error if the user has blocked the bot or disabled DMs
+        await ctx.send(f"❌ I couldn't send a DM to this user. Their DMs are closed.")
+
+@bot.command()
+async def reply(ctx):
+    await ctx.reply("This is a reply to your message!")
+    
+    # Log the reply command
+    await send_log(
+        "💬 Message Replied",
+        f"{ctx.author.mention} triggered a reply in {ctx.channel.mention}.",
+        discord.Color.green()
+    )
+
+@bot.command()
+async def poll(ctx, *, question):
+    embed = discord.Embed(title="New Poll", description=question, color=discord.Color.orange())
+    poll_message = await ctx.send(embed=embed)
+    await poll_message.add_reaction("👍")
+    await poll_message.add_reaction("👎")
+    
+    # Log the poll creation
+    await send_log(
+        "📊 Poll Created",
+        f"{ctx.author.mention} started a poll in {ctx.channel.mention}:\n> {question}",
+        discord.Color.orange()
+    )
+
+@bot.command()
+@commands.has_role(Special_role)
+async def secret(ctx):
+    await ctx.send("Welcome to the club!")
+    
+    # Log successful access to the secret command
+    await send_log(
+        "🔑 Secret Command Accessed",
+        f"{ctx.author.mention} successfully accessed the secret command in {ctx.channel.mention}.",
+        discord.Color.blue()
+    )
+
+@secret.error
+async def secret_error(ctx, error):
+    if isinstance(error, commands.MissingRole):
+        await ctx.send("You do not have permission to do that!")
+        
+        # Log the unauthorized access attempt
+        await send_log(
+            "⚠️ Unauthorized Command Attempt",
+            f"{ctx.author.mention} tried to use the secret command in {ctx.channel.mention} but was missing the required role.",
+            discord.Color.red()
+        )
+
 
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)
 
