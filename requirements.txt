@@ -1,0 +1,23 @@
+bot/
+│
+├── main.py
+├── .env
+├── requirements.txt
+│
+├── cogs/
+│   ├── moderation.py
+│   ├── logging.py
+│   ├── automod.py
+│   ├── fun.py
+│   ├── utility.py
+│   ├── tickets.py
+│   └── music.py
+    └── pfp.py
+    └── reaction.py
+    └── voice.py
+    └── welcomer.py
+│
+│
+├── database/
+├── assets/
+└── logs/
